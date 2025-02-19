@@ -3,15 +3,6 @@ import dynamic from "next/dynamic";
 import React from "react";
 import styles from "./page.module.scss";
 
-const sunSize = 2.5; // rem
-const sunActualSizeKm = 1400000; // 1.4M km
-const earthRotationLength = 4.1; // 4.1s for 365d TODO editable later
-const earthRotationDays = 365;
-const earthRotationDuration = 1; // days
-const scale = 40;
-const durationOfDay = 1; // seconds
-const rotationOn = false; // seconds
-
 const defaultSolarSystem: PlanetProps[] = [
   {
     name: "Mercure",
@@ -45,11 +36,12 @@ const defaultSolarSystem: PlanetProps[] = [
     moons: [
       {
         name: "Lune",
-        size: 12742,
+        size: 3475,
         daysToOrbit: 27.3,
         daysToFullRotation: 27.3,
-        distanceToCenter: 150000000,
+        distanceToCenter: 384400,
         reverseRotationDirection: false,
+        isMoon: true,
         image:
           "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/220px-FullMoon2010.jpg",
       },
@@ -107,6 +99,18 @@ const defaultSolarSystem: PlanetProps[] = [
   },
 ];
 
+const sunSize: number = 5; // rem
+const sunActualSizeKm: number = 1400000; // 1.4M km
+const earthRotationLength: number = 4.1; // 4.1s for 365d TODO editable later
+const earthRotationDays: number = 365;
+const earthRotationDuration: number = 1; // days
+const durationOfDay: number = 1; // seconds
+const rotationOn: boolean = false; // seconds
+const planetScale: number = 10;
+const scale: number = 0.003;
+const moonScale: number = 30;
+const orbitScale: number = 5;
+
 class PlanetProps {
   name!: string;
   size!: number;
@@ -115,33 +119,46 @@ class PlanetProps {
   distanceToCenter!: number;
   reverseRotationDirection!: boolean;
   image!: string;
+  isMoon?: boolean = false;
+  parentBaseSize?: number = 0;
+  parentSize?: number = 0;
+  parentActualSize?: number = 0;
   moons?: PlanetProps[];
 }
 
 function Planet(props: Readonly<PlanetProps>) {
-  const planetSize = (sunSize / sunActualSizeKm) * props.size * scale;
+  const planetSize =
+    ((props.parentSize || 1) / (props.parentActualSize || 1)) *
+    props.size *
+    planetScale;
   const planetRotationLength =
-    (earthRotationLength / earthRotationDays) * props.daysToOrbit;
+    (earthRotationLength / earthRotationDays) * props.daysToOrbit * orbitScale;
   const planetRotationDuration =
     (earthRotationDuration / durationOfDay) * props.daysToFullRotation;
   const planetDistanceToCenter =
-    ((sunSize / sunActualSizeKm) * props.distanceToCenter) / scale;
+    (props.parentBaseSize || 1) / 2 +
+    ((props.parentSize || 1) / (props.parentActualSize || 1)) *
+      props.distanceToCenter *
+      scale *
+      (props.isMoon || false ? moonScale : 1);
 
   const planetOrbitStyle: React.CSSProperties = {
-    width: `calc(${planetDistanceToCenter * 2}rem + 4px)`,
-    height: `calc(${planetDistanceToCenter * 2}rem + 4px)`,
+    width: `${planetDistanceToCenter * 2}rem`,
+    height: `${planetDistanceToCenter * 2}rem`,
     animation: `movement ${planetRotationLength}s linear infinite`,
-    left: `calc(var(--sun-left) - ${planetDistanceToCenter}rem + var(--sun-radius))`,
-    top: `calc(var(--sun-top) - ${planetDistanceToCenter}rem + var(--sun-radius))`,
+    left: props.isMoon
+      ? `calc(calc(${props.parentSize}rem - ${planetDistanceToCenter}rem) - 1px)`
+      : `calc(var(--sun-left) - ${planetDistanceToCenter}rem)`,
+    top: props.isMoon
+      ? `calc(calc(50% - ${planetDistanceToCenter}rem) - 1px)`
+      : `calc(var(--sun-top) - ${planetDistanceToCenter}rem)`,
   };
   const planetContentStyle: React.CSSProperties = {
-    position: "absolute",
     width: `${planetSize}rem`,
     height: `${planetSize}rem`,
     backgroundImage: `url(${props.image})`,
-    backgroundSize: `100%`,
-    top: `calc(50% - ${planetSize / 2}rem)`,
-    left: `-${planetSize / 2}rem`,
+    top: `calc(calc(50% - ${planetSize / 2}rem) - 1px)`,
+    left: `calc(-${planetSize / 2}rem - 1px)`,
     animation: rotationOn
       ? `movement ${planetRotationDuration}s linear infinite`
       : undefined,
@@ -151,28 +168,59 @@ function Planet(props: Readonly<PlanetProps>) {
         : "normal"
       : undefined,
   };
+
+  const moons = planetMapper(
+    props.moons || [],
+    ((props.parentSize || 1) / (props.parentActualSize || 1)) * props.size,
+    planetSize,
+    props.size
+  );
   return (
     <div className={styles.planet} style={planetOrbitStyle} title={props.name}>
-      <div className={styles["planet-image"]} style={planetContentStyle} />
+      {moons}
+      <div className={styles.planetimage} style={planetContentStyle}></div>
     </div>
   );
 }
 
+const planetMapper = (
+  planets: PlanetProps[],
+  parentSize: number,
+  parentBaseSize: number,
+  parentActualSize: number
+) =>
+  planets
+    ?.sort(
+      // Furthest await displayed first
+      (planetA, planetB) => planetB.distanceToCenter - planetA.distanceToCenter
+    )
+    ?.map((planet) => (
+      <Planet
+        key={planet.name}
+        name={planet.name}
+        size={planet.size}
+        daysToOrbit={planet.daysToOrbit}
+        daysToFullRotation={planet.daysToFullRotation}
+        reverseRotationDirection={planet.reverseRotationDirection}
+        distanceToCenter={planet.distanceToCenter}
+        parentSize={parentSize}
+        parentActualSize={parentActualSize}
+        parentBaseSize={parentBaseSize}
+        image={planet.image}
+        isMoon={planet.isMoon}
+        moons={planet.moons}
+      />
+    )) || [];
+
 const Stars = dynamic(() => import("./components/stars"), { ssr: false });
 
 export default function Home() {
-  const planets = defaultSolarSystem.map((planet) => (
-    <Planet
-      key={planet.name}
-      name={planet.name}
-      size={planet.size}
-      daysToOrbit={planet.daysToOrbit}
-      daysToFullRotation={planet.daysToFullRotation}
-      reverseRotationDirection={planet.reverseRotationDirection}
-      distanceToCenter={planet.distanceToCenter}
-      image={planet.image}
-    />
-  ));
+  const planets = planetMapper(
+    defaultSolarSystem,
+    sunSize,
+    sunSize,
+    sunActualSizeKm
+  );
   return (
     <>
       <Stars></Stars>

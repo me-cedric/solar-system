@@ -86,10 +86,14 @@ export function useStars() {
           .join(""),
       animation: "animStar 300s linear infinite",
     };
+    const starAfterStyle: React.CSSProperties = {
+      top: "${random(reference * 2)}px",
+    };
     return {
       starStyle,
       starStyle2,
       starStyle3,
+      starAfterStyle,
       transform: `translateY(-${reference * 2}px)`,
     };
   };
@@ -112,7 +116,8 @@ function random(max: number) {
 }
 
 export default function Stars() {
-  const { starStyle, starStyle2, starStyle3, transform } = useStars();
+  const { starStyle, starStyle2, starStyle3, starAfterStyle, transform } =
+    useStars();
   return (
     <>
       <Keyframes
@@ -120,9 +125,15 @@ export default function Stars() {
         from={{ transform: "translateY(0px)" }}
         to={{ transform }}
       />
-      <div className={styles.stars} style={starStyle}></div>
-      <div className={styles.stars2} style={starStyle2}></div>
-      <div className={styles.stars3} style={starStyle3}></div>
+      <div className={styles.stars} style={starStyle}>
+        <div className={styles.starsafter} style={starAfterStyle}></div>
+      </div>
+      <div className={styles.stars2} style={starStyle2}>
+        <div className={styles.stars2after} style={starAfterStyle}></div>
+      </div>
+      <div className={styles.stars3} style={starStyle3}>
+        <div className={styles.stars3after} style={starAfterStyle}></div>
+      </div>
     </>
   );
 }
