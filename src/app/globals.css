@@ -1,6 +1,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --sun-top: 45vh;
+  --sun-left: 45vw;
+  --sun-radius: 2.5rem;
 }
 
 @media (prefers-color-scheme: dark) {
