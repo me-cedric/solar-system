@@ -51,36 +51,46 @@ function getWindowDimensions() {
 
 export function useStars() {
   const getStyles = () => {
-    const { height } = getWindowDimensions();
+    const { height, width } = getWindowDimensions();
+    const reference = width > height ? width : height;
     const starStyle: React.CSSProperties = {
       boxShadow:
-        `${random(height * 2)}px ${random(height * 2)}px #FFF` +
-        [...Array(700)]
-          .map(() => ` , ${random(height * 2)}px ${random(height * 2)}px #FFF`)
-          .join(""),
-      animation: "animStar 50s linear infinite",
-    };
-    const starStyle2: React.CSSProperties = {
-      boxShadow:
-        `${random(height * 2)}px ${random(height * 2)}px #FFF` +
-        [...Array(200)]
-          .map(() => ` , ${random(height * 2)}px ${random(height * 2)}px #FFF`)
+        `${random(reference * 2)}px ${random(reference * 2)}px #FFF` +
+        [...Array(1400)]
+          .map(
+            () =>
+              ` , ${random(reference * 2)}px ${random(reference * 2)}px #FFF`
+          )
           .join(""),
       animation: "animStar 100s linear infinite",
     };
+    const starStyle2: React.CSSProperties = {
+      boxShadow:
+        `${random(reference * 2)}px ${random(reference * 2)}px #FFF` +
+        [...Array(400)]
+          .map(
+            () =>
+              ` , ${random(reference * 2)}px ${random(reference * 2)}px #FFF`
+          )
+          .join(""),
+      animation: "animStar 200s linear infinite",
+    };
     const starStyle3: React.CSSProperties = {
       boxShadow:
-        `${random(height * 2)}px ${random(height * 2)}px #FFF` +
-        [...Array(100)]
-          .map(() => ` , ${random(height * 2)}px ${random(height * 2)}px #FFF`)
+        `${random(reference * 2)}px ${random(reference * 2)}px #FFF` +
+        [...Array(200)]
+          .map(
+            () =>
+              ` , ${random(reference * 2)}px ${random(reference * 2)}px #FFF`
+          )
           .join(""),
-      animation: "animStar 150s linear infinite",
+      animation: "animStar 300s linear infinite",
     };
     return {
       starStyle,
       starStyle2,
       starStyle3,
-      transform: `translateY(-${height * 2}px)`,
+      transform: `translateY(-${reference * 2}px)`,
     };
   };
   const [stars, setStars] = useState(getStyles());

@@ -106,6 +106,7 @@ const defaultSolarSystem: PlanetProps[] = [
       "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Neptune_-_Voyager_2_%2829347980845%29_flatten_crop.jpg/220px-Neptune_-_Voyager_2_%2829347980845%29_flatten_crop.jpg",
   },
 ];
+
 class PlanetProps {
   name!: string;
   size!: number;
@@ -116,6 +117,7 @@ class PlanetProps {
   image!: string;
   moons?: PlanetProps[];
 }
+
 function Planet(props: Readonly<PlanetProps>) {
   const planetSize = (sunSize / sunActualSizeKm) * props.size * scale;
   const planetRotationLength =
