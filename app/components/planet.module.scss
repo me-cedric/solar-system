@@ -1,0 +1,17 @@
+div.planet {
+    background-color: transparent;
+    border: solid 2px rgba(156, 150, 149, 0.2);
+    border-radius: 1000000000000000px;
+    position: absolute;
+    box-sizing: border-box;
+}
+
+.planet>.planetimage {
+    position: absolute;
+    content: "";
+    border-radius: 1000000000000000px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 110%;
+    box-shadow: inset 2px 0px 5px rgba(0, 0, 0, 0.5);
+}
