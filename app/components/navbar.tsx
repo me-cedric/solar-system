@@ -24,6 +24,12 @@ export function PlanetForm({
   const [localPlanet, setLocalPlanet] = useState<Partial<PlanetProps>>({
     ...planet,
   });
+  const updateData = (newData: Partial<PlanetProps>) => {
+    setLocalPlanet(newData);
+    if (planet.isMoon) {
+      onChange(newData);
+    }
+  };
   const planetForm = Object.entries(PlanetFields).map(([key, value]) => {
     return (
       <InputField
@@ -36,45 +42,29 @@ export function PlanetForm({
         fieldOptions={value}
         onChange={(e) => {
           if (value.type === "boolean") {
-            const newData = {
+            updateData({
               ...localPlanet,
               [key]: e.target.checked,
-            };
-            setLocalPlanet(newData);
-            if (planet.isMoon) {
-              onChange(newData);
-            }
+            });
           } else if (value.type === "image") {
             const file = e.target.files?.[0];
             if (file) {
               const url = URL.createObjectURL(file);
-              const newData = {
+              updateData({
                 ...localPlanet,
                 [key]: url,
-              };
-              setLocalPlanet(newData);
-              if (planet.isMoon) {
-                onChange(newData);
-              }
+              });
             }
           } else if (value.type === "string") {
-            const newData = {
+            updateData({
               ...localPlanet,
               [key]: e.target.value,
-            };
-            setLocalPlanet(newData);
-            if (planet.isMoon) {
-              onChange(newData);
-            }
+            });
           } else {
-            const newData = {
+            updateData({
               ...localPlanet,
               [key]: Number(e.target.value),
-            };
-            setLocalPlanet(newData);
-            if (planet.isMoon) {
-              onChange(newData);
-            }
+            });
           }
         }}
       />
