@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { FaGear, FaPlus, FaXmark } from "react-icons/fa6";
-import { defaultGlobalOptions } from "../defaults";
+import { defaultGlobalOptions, defaultSolarSystem } from "../defaults";
 import { OptionFields, Options } from "../options";
 import AccordionItem from "./accordion";
 import { InputField } from "./input-field";
@@ -27,7 +27,7 @@ export function PlanetForm({
   const planetForm = Object.entries(PlanetFields).map(([key, value]) => {
     return (
       <InputField
-        key={key}
+        key={key + JSON.stringify(value.planetName)}
         value={
           value.type === "boolean"
             ? (localPlanet[key] as boolean)
@@ -76,7 +76,7 @@ export function PlanetForm({
     localPlanet.moons?.map((moon, index) => {
       return (
         <PlanetForm
-          key={index}
+          key={index + JSON.stringify(moon.planetName)}
           index={index}
           planet={moon}
           border={true}
@@ -114,13 +114,13 @@ export function PlanetForm({
       <span>Lunes</span>
       <button
         className="btn"
-        onClick={() =>
-          setLocalPlanet({
+        onClick={() => {
+          const name = Math.floor(Math.random() * (999 - 100 + 1) + 100);
+          return setLocalPlanet({
             ...localPlanet,
             moons: [
               {
-                planetName:
-                  "Lune-" + Math.floor(Math.random() * (999 - 100 + 1) + 100),
+                planetName: "Lune-" + name,
                 size: 4000,
                 daysToOrbit: 100,
                 daysToFullRotation: 100,
@@ -132,8 +132,8 @@ export function PlanetForm({
               },
               ...(localPlanet.moons || []),
             ],
-          })
-        }
+          });
+        }}
       >
         <FaPlus size={24} />
       </button>
@@ -175,7 +175,7 @@ export default function Navbar({
   const planetForms = solarSystem.map((planet, index) => {
     return (
       <PlanetForm
-        key={index}
+        key={index + JSON.stringify(planet.planetName)}
         index={index}
         planet={planet}
         border={false}
@@ -242,19 +242,48 @@ export default function Navbar({
               Appliquer
             </button>
             <button
-              className="btn btn-info mt-2 w-full"
+              className="btn btn-warning mt-2 w-full"
               onClick={() => {
                 setOptions(defaultGlobalOptions);
                 setLocalOptions(defaultGlobalOptions);
               }}
             >
-              Reinitialiser
+              Réinitialiser
             </button>
           </AccordionItem>
           <div className={styles.title}>
             <span>Planètes</span>
-            <button className="btn">Reset</button>
-            <button className="btn">
+            <button
+              className="btn btn-error"
+              onClick={() => setSolarSystem([])}
+            >
+              Vider
+            </button>
+            <button
+              className="btn btn-warning"
+              onClick={() => setSolarSystem(defaultSolarSystem)}
+            >
+              Réinitialiser
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                const name = Math.floor(Math.random() * (999 - 100 + 1) + 100);
+                return setSolarSystem([
+                  {
+                    planetName: "Planette-" + name,
+                    size: 100000,
+                    daysToOrbit: 300,
+                    daysToFullRotation: 1,
+                    distanceToCenter: 500000000,
+                    reverseRotationDirection: false,
+                    image:
+                      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/The_Earth_seen_from_Apollo_17.jpg/220px-The_Earth_seen_from_Apollo_17.jpg",
+                  },
+                  ...solarSystem,
+                ]);
+              }}
+            >
               <FaPlus size={24} />
             </button>
           </div>

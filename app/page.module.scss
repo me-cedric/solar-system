@@ -1,6 +1,7 @@
 div.system {
   height: 100vh;
   width: 100vw;
+  overflow: hidden;
 }
 
 div.sun {
@@ -22,22 +23,4 @@ div.sun {
   border-radius: 1000000000000000px;
   background-position: center;
   box-shadow: inset 2px 0px 5px rgba(0, 0, 0, 0.5);
-}
-
-/* Enable hover only on non-touch devices */
-@media (hover: hover) and (pointer: fine) {
-  a.primary:hover {
-    background: var(--button-primary-hover);
-    border-color: transparent;
-  }
-
-  a.secondary:hover {
-    background: var(--button-secondary-hover);
-    border-color: transparent;
-  }
-
-  .footer a:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
-  }
 }
