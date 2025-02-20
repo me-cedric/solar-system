@@ -57,6 +57,15 @@ export function PlanetForm({
                 onChange(newData);
               }
             }
+          } else if (value.type === "string") {
+            const newData = {
+              ...localPlanet,
+              [key]: e.target.value,
+            };
+            setLocalPlanet(newData);
+            if (planet.isMoon) {
+              onChange(newData);
+            }
           } else {
             const newData = {
               ...localPlanet,
