@@ -36,26 +36,35 @@ export function PlanetForm({
         fieldOptions={value}
         onChange={(e) => {
           if (value.type === "boolean") {
-            setLocalPlanet({
+            const newData = {
               ...localPlanet,
               [key]: e.target.checked,
-            });
+            };
+            setLocalPlanet(newData);
             if (planet.isMoon) {
-              onChange({
+              onChange(newData);
+            }
+          } else if (value.type === "image") {
+            const file = e.target.files?.[0];
+            if (file) {
+              const url = URL.createObjectURL(file);
+              const newData = {
                 ...localPlanet,
-                [key]: e.target.checked,
-              });
+                [key]: url,
+              };
+              setLocalPlanet(newData);
+              if (planet.isMoon) {
+                onChange(newData);
+              }
             }
           } else {
-            setLocalPlanet({
+            const newData = {
               ...localPlanet,
               [key]: Number(e.target.value),
-            });
+            };
+            setLocalPlanet(newData);
             if (planet.isMoon) {
-              onChange({
-                ...localPlanet,
-                [key]: Number(e.target.value),
-              });
+              onChange(newData);
             }
           }
         }}
@@ -100,10 +109,41 @@ export function PlanetForm({
     </button>
   );
 
+  const moonsTitle = planet.isMoon ? null : (
+    <div className={styles.title}>
+      <span>Lunes</span>
+      <button
+        className="btn"
+        onClick={() =>
+          setLocalPlanet({
+            ...localPlanet,
+            moons: [
+              {
+                planetName:
+                  "Lune-" + Math.floor(Math.random() * (999 - 100 + 1) + 100),
+                size: 4000,
+                daysToOrbit: 100,
+                daysToFullRotation: 100,
+                distanceToCenter: 100000,
+                reverseRotationDirection: false,
+                isMoon: true,
+                image:
+                  "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/220px-FullMoon2010.jpg",
+              },
+              ...(localPlanet.moons || []),
+            ],
+          })
+        }
+      >
+        <FaPlus size={24} />
+      </button>
+    </div>
+  );
+
   return (
-    <AccordionItem border={border} header={localPlanet.planetName} margin={2}>
+    <AccordionItem border={border} header={localPlanet.planetName}>
       {planetForm}
-      <p>Lunes</p>
+      {moonsTitle}
       {moonForms}
       {apply}
       <button
@@ -213,6 +253,7 @@ export default function Navbar({
           </AccordionItem>
           <div className={styles.title}>
             <span>Planètes</span>
+            <button className="btn">Reset</button>
             <button className="btn">
               <FaPlus size={24} />
             </button>

@@ -1,19 +1,16 @@
 export default function AccordionItem({
   header,
   border,
-  margin,
   children,
 }: {
   header: React.ReactNode;
   border: boolean;
-  margin?: number;
   children: React.ReactNode;
 }) {
   return (
     <div
       className={
-        "collapse collapse-arrow bg-base-200" +
-        (margin ? " mb-" + margin : "") +
+        "collapse collapse-arrow bg-base-200 mb-2" +
         (border ? " border border-neutral-400" : "")
       }
     >

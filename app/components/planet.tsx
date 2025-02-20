@@ -38,7 +38,7 @@ export class PlanetFields {
   };
   static daysToOrbit: FieldOptions = {
     type: "number",
-    label: "Durée de l'orbit autour du soleil (en jour)",
+    label: "Durée de l'orbit autour du réferentiel (en jour)",
     min: 1,
     step: 1,
   };
@@ -50,7 +50,7 @@ export class PlanetFields {
   };
   static distanceToCenter: FieldOptions = {
     type: "number",
-    label: "Distance du soleil (en km)",
+    label: "Distance du réferentiel (en km)",
     min: 1000,
     step: 1000,
   };
@@ -84,29 +84,30 @@ export default function Planet(props: Readonly<PlanetProps>) {
       (props.isMoon || false ? props.options.moonScale : 1);
 
   const planetOrbitStyle: React.CSSProperties = {
-    width: `${planetDistanceToCenter * 2}rem`,
-    height: `${planetDistanceToCenter * 2}rem`,
-    animation: `movement ${planetRotationLength}s linear infinite`,
+    width: props.isMoon
+      ? `calc(${planetDistanceToCenter * 2}rem + 0.25rem)`
+      : `calc(${planetDistanceToCenter * 2}rem)`,
+    height: props.isMoon
+      ? `calc(${planetDistanceToCenter * 2}rem + 0.25rem)`
+      : `calc(${planetDistanceToCenter * 2}rem)`,
+    animation:
+      `movement ${planetRotationLength}s linear infinite ` +
+      (props.reverseRotationDirection ? "reverse" : "normal"),
     left: props.isMoon
-      ? `calc(calc(${props.parentSize}rem - ${planetDistanceToCenter}rem) - 1px)`
+      ? `calc(-${planetDistanceToCenter}rem - 0.125rem)`
       : `calc(var(--sun-left) - ${planetDistanceToCenter}rem)`,
     top: props.isMoon
-      ? `calc(calc(50% - ${planetDistanceToCenter}rem) - 1px)`
+      ? `calc(50% - ${planetDistanceToCenter}rem - 0.125rem)`
       : `calc(var(--sun-top) - ${planetDistanceToCenter}rem)`,
   };
   const planetContentStyle: React.CSSProperties = {
     width: `${planetSize}rem`,
     height: `${planetSize}rem`,
     backgroundImage: `url(${props.image})`,
-    top: `calc(calc(50% - ${planetSize / 2}rem) - 1px)`,
-    left: `calc(-${planetSize / 2}rem - 1px)`,
+    top: `calc(50% - ${planetSize / 2}rem)`,
+    left: `calc(-${planetSize / 2}rem)`,
     animation: props.options.rotationOn
       ? `movement ${planetRotationDuration}s linear infinite`
-      : undefined,
-    animationDirection: props.options.rotationOn
-      ? props.reverseRotationDirection
-        ? "reverse"
-        : "normal"
       : undefined,
   };
 
@@ -123,8 +124,8 @@ export default function Planet(props: Readonly<PlanetProps>) {
       style={planetOrbitStyle}
       title={props.planetName}
     >
-      {moons}
       <div className={styles.planetimage} style={planetContentStyle}></div>
+      {moons}
     </div>
   );
 }
